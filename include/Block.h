@@ -9,14 +9,12 @@ typedef unsigned int type;
 typedef std::vector<type> type_vector;
 
 // tuples represent the type of inputs and outputs of blocks
-template <typename T>
-using tuple = std::vector<std::pair<type, T>>;
+using tuple = std::vector<std::pair<type, char*>>;
 
 /*
  * Create a pair of some (type, value)
  */
-template <typename T>
-std::pair<type, T> link(type var, T val) {
+std::pair<type, char*> link(type var, char* val) {
   return std::make_pair(var, val);
 }
 
@@ -32,18 +30,23 @@ class Block {
      * @param input of block
      * @return output of block
      */
-    template <typename T>
-    tuple<T> run(tuple<T> input); 
+    virtual tuple run(tuple input) = 0; 
 
   protected:
+    /*
+     * constructor to set expected type_vector
+     *
+     * @param expected type_vector
+     */
+    Block(type_vector expected);
+
     /*
      * typecheck an input tuple with the expected input
      * 
      * @param input of block
      * @return whether it typechecks
      */
-    template <typename T>
-    bool typeCheck(tuple<T> input) {
+    bool typeCheck(tuple input) {
       if (input.size() != expected_.size()) {
         return false;
       }
