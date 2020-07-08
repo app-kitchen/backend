@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -10,13 +12,16 @@ typedef unsigned int type;
 // type_vectors represent a vector of types
 typedef std::vector<type> type_vector;
 
+// pair that represents a single value
+typedef std::pair<type, void*> value;
+
 // tuples represent the type of inputs and outputs of blocks
-using tuple = std::vector<std::pair<type, char*>>;
+typedef std::vector<value> tuple;
 
 /*
  * Create a pair of some (type, value)
  */
-std::pair<type, char*> link(type var, char* val) {
+std::pair<type, void*> link(type var, void* val) {
   return std::make_pair(var, val);
 }
 
@@ -40,15 +45,6 @@ class Block {
 
   protected:
     /*
-     * process some tuple given an input tuple
-     * --to be overrided--
-     *
-     * @param input of block
-     * @return output of block
-     */
-    virtual tuple process(tuple input) = 0; 
-
-    /*
      * constructor to set expected type_vector
      *
      * @param expected type_vector
@@ -56,6 +52,33 @@ class Block {
     Block(type_vector expected) {
       expected_ = expected;
     }
+
+    /*
+     * process some tuple given an input tuple
+     * --to be overrided--
+     *
+     * @param input of block
+     * @return output of block
+     */
+    virtual tuple process(tuple input) = 0; 
+ 
+    /*
+     * converts regular valued types to values
+     * 
+     * @param regular valued type to convert
+     */
+    value toValue(float val);
+    value toValue(std::string val);
+    value toValue(bool val);
+ 
+    /*
+     * converts values to regular valued types
+     * 
+     * @param value to convert
+     */
+    float toInt(value val);
+    std::string toStr(value val);
+    bool toBool(value val);
 
   private:
     /*
@@ -75,7 +98,7 @@ class Block {
       }
       return true;
     }
-    
+ 
     // the expected type_vector of block inputs
     type_vector expected_; 
 };
