@@ -1,3 +1,5 @@
+#include <iostream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -25,21 +27,37 @@ class Block {
   public:
     /*
      * output some tuple given an input tuple
+     *
+     * @param input of block
+     * @return output of block
+     */
+    tuple run(tuple input) {
+      if (!typeCheck(input)) {
+        throw std::invalid_argument("given type does not match expected type"); 
+      }
+      return process(input);
+    }
+
+  protected:
+    /*
+     * process some tuple given an input tuple
      * --to be overrided--
      *
      * @param input of block
      * @return output of block
      */
-    virtual tuple run(tuple input) = 0; 
+    virtual tuple process(tuple input) = 0; 
 
-  protected:
     /*
      * constructor to set expected type_vector
      *
      * @param expected type_vector
      */
-    Block(type_vector expected);
+    Block(type_vector expected) {
+      expected_ = expected;
+    }
 
+  private:
     /*
      * typecheck an input tuple with the expected input
      * 
